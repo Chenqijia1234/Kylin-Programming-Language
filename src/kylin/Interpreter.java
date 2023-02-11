@@ -8,58 +8,89 @@ public class Interpreter {
     protected String textReader;
     protected int position = 0;
     protected Token currentToken;
+    protected Character currentChar;
 
     public Interpreter(String textReader) {
         this.textReader = textReader;
+        this.currentChar = this.textReader.charAt(position);
     }
 
     protected void throwError() throws kylinException {
-        throw new kylinException("Wrong input");
+        throw new kylinException("错误的输入内容");
     }
 
     public Token getNextToken() throws kylinException {
-        if (position >= textReader.length()) {
-            return new Token(Constants.EOF, null);
+        while (currentChar != null) {
+            if (Character.isWhitespace(currentChar)) {
+                skipWhiteSpace();
+                continue;
+            }
+            if (Character.isDigit(currentChar)) {
+                return new Token(INTEGER, getLongInteger());
+            }
+            if (currentChar.equals('+')) {
+                advancePosition();
+                return new Token(PLUS, currentChar);
+            }
+            if (currentChar.equals('-')) {
+                advancePosition();
+                return new Token(MINUS, currentChar);
+            }
+            throwError();
         }
+        return new Token(EOF, null);
+    }
 
-        char currentChar = textReader.charAt(position);
-        if (Character.isDigit(currentChar)) {
-            Token token = new Token(INTEGER, Integer.valueOf(String.valueOf(currentChar)));
-            position++;
-            return token;
+    public void advancePosition() {
+        position++;
+        if (position >= textReader.length()) {
+            currentChar = null;
+        } else {
+            currentChar = textReader.charAt(position);
         }
-        if (currentChar == '+') {
-            Token token = new Token(PLUS, currentChar);
-            position++;
-            return token;
+    }
+
+    public void skipWhiteSpace() {
+        while (currentChar != null && Character.isWhitespace(currentChar)) {
+            advancePosition();
         }
-        throwError();
-        return null;
+    }
+
+    public int getLongInteger() {
+        StringBuilder result = new StringBuilder();
+        while (currentChar != null && Character.isDigit(currentChar)) {
+            result.append(currentChar);
+            advancePosition();
+        }
+        return Integer.parseInt(result.toString());
+    }
+
+    public void eat(Constants tokenType) throws kylinException {
+        if (currentToken.getValueType() == tokenType) {
+            currentToken = getNextToken();
+        } else {
+            throwError();
+        }
     }
 
     public int expr() throws kylinException {
         currentToken = getNextToken();
 
         Token left = currentToken;
-        if(currentToken.getValueType().equals(INTEGER)){
-            currentToken = getNextToken();
-        }else{
-            throwError();
-        }
+        eat(INTEGER);
 
         Token operator = currentToken;
-        if(currentToken.getValueType().equals(PLUS)){
-            currentToken = getNextToken();
-        }else{
-            throwError();
-        }
+        if (operator.getValueType() == PLUS) eat(PLUS);
+        else eat(MINUS);
+
         Token right = currentToken;
-        if(currentToken.getValueType().equals(INTEGER)){
-            currentToken = getNextToken();
-        }else{
-            throwError();
+        eat(INTEGER);
+
+        if (operator.getValueType() == PLUS) {
+            return (int) left.getValue() + (int) right.getValue();
+        } else {
+            return (int) left.getValue() - (int) right.getValue();
         }
 
-        return (int)left.getValue() + (int) right.getValue();
     }
 }
