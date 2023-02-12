@@ -4,5 +4,7 @@ public enum Constants {
     INTEGER,
     PLUS,
     EOF,
-    MINUS
+    MINUS,
+    MUL,
+    DIV
 }

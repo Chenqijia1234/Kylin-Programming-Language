@@ -1,3 +1,8 @@
+/**
+ * @auther Chenqijia1234
+ * @Date 2023/02/12
+ */
+
 package kylin;
 
 import kylin.tokens.Token;
@@ -5,6 +10,7 @@ import kylin.tokens.Token;
 import static kylin.Constants.*;
 
 public class Interpreter {
+
     protected String textReader;
     protected int position = 0;
     protected Token currentToken;
@@ -35,6 +41,14 @@ public class Interpreter {
             if (currentChar.equals('-')) {
                 advancePosition();
                 return new Token(MINUS, currentChar);
+            }
+            if (currentChar.equals('*')) {
+                advancePosition();
+                return new Token(MUL, currentChar);
+            }
+            if (currentChar.equals('/')) {
+                advancePosition();
+                return new Token(DIV, currentChar);
             }
             throwError();
         }
@@ -80,16 +94,27 @@ public class Interpreter {
         eat(INTEGER);
 
         Token operator = currentToken;
-        if (operator.getValueType() == PLUS) eat(PLUS);
-        else eat(MINUS);
+        if (operator.getValueType() == PLUS) {
+            eat(PLUS);
+        } else if(operator.getValueType() == MINUS){
+            eat(MINUS);
+        } else if (operator.getValueType() == MUL){
+            eat(MUL);
+        } else{
+            eat(DIV);
+        }
 
         Token right = currentToken;
         eat(INTEGER);
 
         if (operator.getValueType() == PLUS) {
             return (int) left.getValue() + (int) right.getValue();
-        } else {
+        } else if (operator.getValueType() == MINUS) {
             return (int) left.getValue() - (int) right.getValue();
+        } else if (operator.getValueType() == MUL) {
+            return (int) left.getValue() * (int) right.getValue();
+        } else{
+            return (int) left.getValue() / (int) right.getValue();
         }
 
     }

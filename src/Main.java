@@ -5,18 +5,18 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        while(true){
+        while (true) {
             System.out.print(">>>");
             String text = scanner.nextLine();
-            if(text.trim().equals("exit")) {
+            if (text.trim().equals("exit")) {
                 System.out.print("Bye");
                 break;
             }
             Interpreter interpreter = new Interpreter(text);
-            try{
+            try {
                 int result = interpreter.expr();
                 System.out.println(result);
-            }catch (kylinException kylinException){
+            } catch (kylinException kylinException) {
                 System.out.println(kylinException.getMessage());
             }
         }
