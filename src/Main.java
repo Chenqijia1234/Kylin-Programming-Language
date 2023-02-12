@@ -1,4 +1,5 @@
-import kylin.*;
+import kylin.Interpreter;
+import kylin.kylinException;
 
 import java.util.Scanner;
 

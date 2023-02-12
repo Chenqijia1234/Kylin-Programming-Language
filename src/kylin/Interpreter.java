@@ -1,11 +1,4 @@
-/**
- * @auther Chenqijia1234
- * @Date 2023/02/12
- */
-
 package kylin;
-
-import kylin.tokens.Token;
 
 import static kylin.Constants.*;
 
@@ -90,32 +83,36 @@ public class Interpreter {
     public int expr() throws kylinException {
         currentToken = getNextToken();
 
-        Token left = currentToken;
+        Token start = currentToken;
         eat(INTEGER);
 
-        Token operator = currentToken;
-        if (operator.getValueType() == PLUS) {
-            eat(PLUS);
-        } else if(operator.getValueType() == MINUS){
-            eat(MINUS);
-        } else if (operator.getValueType() == MUL){
-            eat(MUL);
-        } else{
-            eat(DIV);
+        int result = (int) start.getValue();
+
+        while (currentToken.getValueType() != EOF) {
+            Token operator = currentToken;
+            if (operator.getValueType() == PLUS) {
+                eat(PLUS);
+            } else if (operator.getValueType() == MINUS) {
+                eat(MINUS);
+            } else if (operator.getValueType() == MUL) {
+                eat(MUL);
+            } else {
+                eat(DIV);
+            }
+
+            Token loopData = currentToken;
+            eat(INTEGER);
+
+            if (operator.getValueType() == PLUS) {
+                result += ((int) loopData.getValue());
+            } else if (operator.getValueType() == MINUS) {
+                result -= ((int) loopData.getValue());
+            } else if (operator.getValueType() == MUL) {
+                result *= ((int) loopData.getValue());
+            } else {
+                result /= ((int) loopData.getValue());
+            }
         }
-
-        Token right = currentToken;
-        eat(INTEGER);
-
-        if (operator.getValueType() == PLUS) {
-            return (int) left.getValue() + (int) right.getValue();
-        } else if (operator.getValueType() == MINUS) {
-            return (int) left.getValue() - (int) right.getValue();
-        } else if (operator.getValueType() == MUL) {
-            return (int) left.getValue() * (int) right.getValue();
-        } else{
-            return (int) left.getValue() / (int) right.getValue();
-        }
-
+        return result;
     }
 }

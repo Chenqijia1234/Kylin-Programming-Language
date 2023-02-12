@@ -1,6 +1,4 @@
-package kylin.tokens;
-
-import kylin.Constants;
+package kylin;
 
 import java.util.Objects;
 
